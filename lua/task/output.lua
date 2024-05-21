@@ -1,14 +1,19 @@
 local core = require("core")
 local bufnr
+local winnr
 
-local to_split_win = function(output)
+local split_win = function(output)
 	if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
 		bufnr = vim.api.nvim_create_buf(false, false)
-		local handle = core.win.split_win(bufnr, {
+	end
+	local handle
+	if not winnr or not vim.api.nvim_win_is_valid(winnr) then
+		handle = core.win.split_win(bufnr, {
 			direction = "hb",
 			size = 20,
 			enter = false,
 		})
+		winnr = handle.winnr
 		vim.api.nvim_set_option_value("number", false, {
 			win = handle.winnr,
 		})
@@ -39,5 +44,5 @@ local to_split_win = function(output)
 end
 
 return {
-	to_split_win = to_split_win,
+	split_win = split_win,
 }
