@@ -97,8 +97,15 @@ local notify = function(output, task_name)
 	})
 end
 
+local notify_done = function(_, task_name)
+	vim.notify(string.format("Task %s done", task_name), vim.log.levels.OFF, {
+		title = "Task",
+	})
+end
+
 return {
 	use_split_win = use_split_win,
 	use_float_win = use_float_win,
 	notify = notify,
+	notify_done = notify_done,
 }
