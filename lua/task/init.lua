@@ -2,7 +2,7 @@ local static = require("task.static")
 local core = require("core")
 
 ---@param task_name string
----@param on_job_exit fun(output: string, task_name: string) | nil
+---@param on_job_exit fun(output: string, task_name: string) | fun(output: string, task_name: string)[] | nil
 local run = function(task_name, on_job_exit)
 	local get_config = static.tasks[task_name]
 	if not get_config then
@@ -30,8 +30,17 @@ local run = function(task_name, on_job_exit)
 	end
 
 	local on_exit = function()
-		on_job_exit = on_job_exit or require("task.output").notify
-		on_job_exit(static.task_output[task_name], task_name)
+		if not on_job_exit then
+			on_job_exit = { require("task.output").notify }
+		end
+		---@diagnostic disable-next-line: param-type-mismatch
+		if not vim.islist(on_job_exit) then
+			on_job_exit = { on_job_exit }
+		end
+		---@diagnostic disable-next-line: param-type-mismatch
+		core.lua.list.each(on_job_exit, function(fn)
+			fn(static.task_output[task_name], task_name)
+		end)
 		static.task_handles[task_name] = nil
 	end
 	local on_output = function(_, data)
