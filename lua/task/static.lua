@@ -6,8 +6,9 @@
 ---@class task.Task
 ---@field name string
 ---@field config fun(): task.Config
+---@field on_exit fun(output: string, task_name: string) | fun(output: string, task_name: string)[] | nil
 
----@type {[string]: fun(): task.Config}
+---@type {[string]: task.Task}
 local tasks = {}
 
 ---@type {[string]: {terminate: fun(), stdin: uv_pipe_t, running: fun():boolean}}

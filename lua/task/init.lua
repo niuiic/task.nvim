@@ -2,16 +2,15 @@ local static = require("task.static")
 local core = require("core")
 
 ---@param task_name string
----@param on_job_exit fun(output: string, task_name: string) | fun(output: string, task_name: string)[] | nil
-local run = function(task_name, on_job_exit)
-	local get_config = static.tasks[task_name]
-	if not get_config then
+local run = function(task_name)
+	if not static.tasks[task_name] then
 		vim.notify(string.format("Task %s not found", vim.log.levels.ERROR, {
 			title = "Task",
 		}))
 		return
 	end
-	local config = get_config()
+
+	local config = static.tasks[task_name].config()
 	if not config then
 		vim.notify("No config provided, task exits", vim.log.levels.WARN, {
 			title = "Task",
@@ -30,6 +29,8 @@ local run = function(task_name, on_job_exit)
 	end
 
 	local on_exit = function()
+		local on_job_exit = static.tasks[task_name].on_exit
+
 		if not on_job_exit then
 			on_job_exit = { require("task.output").notify }
 		end
@@ -56,10 +57,9 @@ local run = function(task_name, on_job_exit)
 end
 
 ---@param task_name string | nil
----@param on_exit fun(output) | nil
-local launch = function(task_name, on_exit)
+local launch = function(task_name)
 	if task_name then
-		run(task_name, on_exit)
+		run(task_name)
 		return
 	end
 
@@ -73,7 +73,7 @@ local launch = function(task_name, on_exit)
 	end
 
 	if #items == 1 then
-		run(items[1], on_exit)
+		run(items[1])
 		return
 	end
 
@@ -83,7 +83,7 @@ local launch = function(task_name, on_exit)
 		if not choice then
 			return
 		end
-		run(choice, on_exit)
+		run(choice)
 	end)
 end
 
@@ -140,7 +140,7 @@ local register = function(task)
 		})
 	end
 
-	static.tasks[task.name] = task.config
+	static.tasks[task.name] = task
 end
 
 return {
