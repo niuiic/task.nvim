@@ -91,7 +91,14 @@ local use_float_win = function(option)
 	return float_win
 end
 
+local notify = function(output, task_name)
+	vim.notify(output, vim.log.levels.INFO, {
+		title = string.format("Task %s", task_name),
+	})
+end
+
 return {
 	use_split_win = use_split_win,
 	use_float_win = use_float_win,
+	notify = notify,
 }

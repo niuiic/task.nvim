@@ -2,7 +2,7 @@ local static = require("task.static")
 local core = require("core")
 
 ---@param task_name string
----@param on_job_exit fun(output) | nil
+---@param on_job_exit fun(output: string, task_name: string) | nil
 local run = function(task_name, on_job_exit)
 	local get_config = static.tasks[task_name]
 	if not get_config then
@@ -30,13 +30,8 @@ local run = function(task_name, on_job_exit)
 	end
 
 	local on_exit = function()
-		if not on_job_exit then
-			vim.notify(static.task_output[task_name], vim.log.levels.INFO, {
-				title = string.format("Task %s", task_name),
-			})
-		else
-			on_job_exit(static.task_output[task_name])
-		end
+		on_job_exit = on_job_exit or require("task.output").notify
+		on_job_exit(static.task_output[task_name], task_name)
 		static.task_handles[task_name] = nil
 	end
 	local on_output = function(_, data)
@@ -84,7 +79,7 @@ local launch = function(task_name, on_exit)
 end
 
 ---@param task_name string | nil
----@param output_method fun(output) | nil
+---@param output_method fun(output: string, task_name: string) | nil
 local preview = function(task_name, output_method)
 	local render = function(name)
 		output_method = output_method or require("task.output").use_float_win()
@@ -96,7 +91,7 @@ local preview = function(task_name, output_method)
 			return
 		end
 
-		output_method(static.task_output[name])
+		output_method(static.task_output[name], name)
 	end
 
 	if task_name then
