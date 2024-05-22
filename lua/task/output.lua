@@ -13,6 +13,12 @@ local use_split_win = function(option)
 	local split_win = function(output)
 		if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
 			bufnr = vim.api.nvim_create_buf(false, false)
+			vim.api.nvim_set_option_value("filetype", "terminal", {
+				buf = bufnr,
+			})
+			vim.api.nvim_set_option_value("modifiable", false, {
+				buf = bufnr,
+			})
 		end
 		local handle
 		if not winnr or not vim.api.nvim_win_is_valid(winnr) then
@@ -44,7 +50,13 @@ local use_split_win = function(option)
 			})
 		end
 
+		vim.api.nvim_set_option_value("modifiable", true, {
+			buf = bufnr,
+		})
 		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, core.lua.string.split(output, "\n"))
+		vim.api.nvim_set_option_value("modifiable", false, {
+			buf = bufnr,
+		})
 	end
 
 	return split_win
@@ -73,6 +85,12 @@ local use_float_win = function(option)
 
 		if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
 			bufnr = vim.api.nvim_create_buf(false, false)
+			vim.api.nvim_set_option_value("filetype", "terminal", {
+				buf = bufnr,
+			})
+			vim.api.nvim_set_option_value("modifiable", false, {
+				buf = bufnr,
+			})
 			core.lua.list.each({ "q", "<esc>" }, function(key)
 				vim.keymap.set("n", key, function()
 					if win_handle and win_handle.win_opening() then
@@ -87,7 +105,13 @@ local use_float_win = function(option)
 			win_handle = core.win.open_float(bufnr, option)
 		end
 
+		vim.api.nvim_set_option_value("modifiable", true, {
+			buf = bufnr,
+		})
 		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, core.lua.string.split(output, "\n"))
+		vim.api.nvim_set_option_value("modifiable", false, {
+			buf = bufnr,
+		})
 	end
 
 	return float_win
