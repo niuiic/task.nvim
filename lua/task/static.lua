@@ -10,6 +10,14 @@
 ---@type {[string]: fun(): task.Config}
 local tasks = {}
 
+---@type {[string]: {terminate: fun(), stdin: uv_pipe_t, running: fun():boolean}}
+local task_handles = {}
+
+---@type {[string]: string}
+local task_output = {}
+
 return {
 	tasks = tasks,
+	task_handles = task_handles,
+	task_output = task_output,
 }
