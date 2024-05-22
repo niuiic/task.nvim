@@ -63,13 +63,14 @@ local use_float_win = function(option)
 			col = size.col,
 			style = "minimal",
 			border = "rounded",
-			title = "Task output",
 			title_pos = "center",
 		}
 	local bufnr
 	local win_handle
 
-	local float_win = function(output)
+	local float_win = function(output, task_name)
+		option.title = task_name
+
 		if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
 			bufnr = vim.api.nvim_create_buf(false, false)
 			core.lua.list.each({ "q", "<esc>" }, function(key)
@@ -82,6 +83,7 @@ local use_float_win = function(option)
 		end
 
 		if not win_handle or not vim.api.nvim_win_is_valid(win_handle.winnr) then
+			---@diagnostic disable-next-line: param-type-mismatch
 			win_handle = core.win.open_float(bufnr, option)
 		end
 
