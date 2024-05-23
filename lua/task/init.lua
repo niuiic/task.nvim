@@ -53,7 +53,7 @@ local run = function(task_name)
 
 	static.task_output[task_name] = ""
 	static.task_handles[task_name] =
-		core.job.spawn(config.cmd, config.args, config.options or {}, on_exit, on_output, on_err)
+		core.job.spawn(config.cmd, config.args, config.options or {}, on_exit, on_err, on_output)
 end
 
 ---@param task_name string | nil
