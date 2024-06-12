@@ -46,9 +46,51 @@ local run = function(task_name)
 	end
 	local on_output = function(_, data)
 		static.task_output[task_name] = static.task_output[task_name] .. data
+		local task_handle = static.task_handles[task_name]
+		if not task_handle then
+			return
+		end
+		local on_job_output = static.tasks[task_name].on_output
+		if not on_job_output then
+			return
+		end
+		---@diagnostic disable-next-line: param-type-mismatch
+		if not vim.islist(on_job_output) then
+			---@diagnostic disable-next-line: assign-type-mismatch
+			on_job_output = { on_job_output }
+		end
+		local write = function(str)
+			vim.uv.write(task_handle.stdin, str)
+			static.task_output[task_name] = static.task_output[task_name] .. str
+		end
+		---@diagnostic disable-next-line: param-type-mismatch
+		core.lua.list.each(on_job_output, function(fn)
+			fn(data, write, task_name)
+		end)
 	end
 	local on_err = function(_, data)
 		static.task_output[task_name] = static.task_output[task_name] .. data
+		local task_handle = static.task_handles[task_name]
+		if not task_handle then
+			return
+		end
+		local on_job_err = static.tasks[task_name].on_err
+		if not on_job_err then
+			return
+		end
+		---@diagnostic disable-next-line: param-type-mismatch
+		if not vim.islist(on_job_err) then
+			---@diagnostic disable-next-line: assign-type-mismatch
+			on_job_err = { on_job_err }
+		end
+		local write = function(str)
+			vim.uv.write(task_handle.stdin, str)
+			static.task_output[task_name] = static.task_output[task_name] .. str
+		end
+		---@diagnostic disable-next-line: param-type-mismatch
+		core.lua.list.each(on_job_err, function(fn)
+			fn(data, write, task_name)
+		end)
 	end
 
 	static.task_output[task_name] = ""

@@ -25,16 +25,24 @@ local split_win = require("task.output").use_split_win()
 ---@class task.Task
 ---@field name string
 ---@field config fun(): task.Config
+---@field on_err fun(output: string, write: fun(str), task_name: string) | fun(output: string, write: fun(str), task_name: string)[] | nil
+---@field on_output fun(output: string, write: fun(str), task_name: string) | fun(output: string, write: fun(str), task_name: string)[] | nil
 ---@field on_exit fun(output: string, task_name: string) | fun(output: string, task_name: string)[] | nil
 
 ---@param task task.Task
 require("task").register({
-	name = "dart",
+	name = "restart conatiner",
 	config = function()
 		return {
-			cmd = "dart",
-			args = { "run", vim.api.nvim_buf_get_name(0) },
+			cmd = "sudo",
+			args = { "-S", "podman", "restart", "openresty" },
 		}
+	end,
+	on_err = function(output, write)
+		if string.match(output, "[sudo].*") then
+			-- write to stdin
+			write("password\n")
+		end
 	end,
 	on_exit = {
 		require("task.output").notify_done,
