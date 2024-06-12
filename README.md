@@ -39,7 +39,7 @@ require("task").register({
 		}
 	end,
 	on_err = function(output, write)
-		if string.match(output, "[sudo].*") then
+		if string.match(output, "%[sudo%] password for.*") then
 			-- write to stdin
 			write("password\n")
 		end
