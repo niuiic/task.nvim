@@ -105,7 +105,11 @@ local launch = function(task_name)
 		return
 	end
 
-	local items = core.lua.table.keys(static.tasks)
+	local items = vim.iter(vim.tbl_keys(static.tasks))
+		:filter(function(task)
+			return not static.tasks[task].is_enabled or static.tasks[task].is_enabled()
+		end)
+		:totable()
 
 	if #items == 0 then
 		vim.notify("No task registered", vim.log.levels.WARN, {
@@ -150,7 +154,11 @@ local preview = function(task_name, output_method)
 		return
 	end
 
-	local items = core.lua.table.keys(static.tasks)
+	local items = vim.iter(vim.tbl_keys(static.tasks))
+		:filter(function(task)
+			return not static.tasks[task].is_enabled or static.tasks[task].is_enabled()
+		end)
+		:totable()
 
 	if #items == 0 then
 		vim.notify("No task registered", vim.log.levels.WARN, {

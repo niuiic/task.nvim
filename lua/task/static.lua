@@ -5,6 +5,7 @@
 
 ---@class task.Task
 ---@field name string
+---@field is_enabled (fun(): boolean) | nil
 ---@field config fun(): task.Config
 ---@field on_err fun(output: string, write: fun(str), task_name: string) | fun(output: string, write: fun(str), task_name: string)[] | nil
 ---@field on_output fun(output: string, write: fun(str), task_name: string) | fun(output: string, write: fun(str), task_name: string)[] | nil
