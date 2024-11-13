@@ -14,9 +14,11 @@ end
 
 -- % run_task %
 function M.run_task()
-	local tasks = vim.iter(vim.tbl_values(M._tasks)):filter(function(task)
-		return not task.is_enabled or task.is_enabled()
-	end)
+	local tasks = vim.iter(vim.tbl_values(M._tasks))
+		:filter(function(task)
+			return not task.is_enabled or task.is_enabled()
+		end)
+		:totable()
 
 	if #tasks == 0 then
 		vim.notify("No tasks registered", vim.log.levels.WARN, { title = "Task" })
